@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kermes Menü</title>
+
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    margin: 0;
+    background: #f5f5f5;
+}
+
+.container {
+    max-width: 600px;
+    margin: auto;
+    padding: 15px;
+}
+
+.lang-btn {
+    width: 100%;
+    padding: 16px;
+    margin: 8px 0;
+    font-size: 18px;
+    border: none;
+    border-radius: 12px;
+    background: #ff7a00;
+    color: white;
+}
+
+h2 {
+    margin-top: 30px;
+}
+
+.card {
+    background: white;
+    border-radius: 14px;
+    margin: 10px 0;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.card img {
+    width: 80px;
+    height: 80px;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+.title {
+    font-weight: 600;
+}
+
+.price {
+    margin-left: auto;
+    font-weight: bold;
+}
+
+.hidden {
+    display: none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container" id="lang">
+<h2>🌍 Dil seçiniz</h2>
+
+<button class="lang-btn" onclick="loadMenu('tr')">🇹🇷 Türkçe</button>
+<button class="lang-btn" onclick="loadMenu('fr')">🇫🇷 Français</button>
+<button class="lang-btn" onclick="loadMenu('nl')">🇧🇪 Nederlands</button>
+
+</div>
+
+<div class="container hidden" id="menu"></div>
+
+<script>
+
+// 🔴 BURAYA KENDİ SHEETS LINKİNİ KOY
+const sheetURL = "https://opensheet.elk.sh/1ctqry-ahkGcmaAxr7xLueborI5cGTQUBlvEZcAJhbCc/Sheet1";
+
+function loadMenu(lang) {
+    document.getElementById('lang').style.display = 'none';
+    document.getElementById('menu').classList.remove("hidden");
+
+    fetch(sheetURL)
+    .then(res => res.json())
+    .then(data => {
+
+        let html = "";
+        let currentCategory = "";
+
+        data.forEach(item => {
+
+            let kategori = item["kategori_" + lang];
+            let urun = item["urun_" + lang];
+
+            if (kategori !== currentCategory) {
+                html += `<h2>${kategori}</h2>`;
+                currentCategory = kategori;
+            }
+
+            html += `
+            <div class="card">
+                <img src="${item.resim}" alt="">
+                <div class="title">${urun}</div>
+                <div class="price">${item.fiyat}</div>
+            </div>
+            `;
+        });
+
+        document.getElementById('menu').innerHTML = html;
+
+    });
+}
+
+</script>
+
+</body>
+</html>
