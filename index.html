@@ -18,6 +18,7 @@ body {
     padding: 15px;
 }
 
+/* Dil butonları */
 .lang-btn {
     width: 100%;
     padding: 16px;
@@ -29,10 +30,17 @@ body {
     color: white;
 }
 
-h2 {
+/* Kategori */
+.category {
+    font-size: 22px;
+    font-weight: bold;
     margin-top: 30px;
+    margin-bottom: 10px;
+    padding-left: 10px;
+    border-left: 5px solid #ff7a00;
 }
 
+/* Kart */
 .card {
     background: white;
     border-radius: 14px;
@@ -40,13 +48,18 @@ h2 {
     padding: 10px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    transition: 0.2s;
+}
+
+.card:hover {
+    transform: scale(1.02);
 }
 
 .card img {
-    width: 80px;
-    height: 80px;
+    width: 90px;
+    height: 90px;
     border-radius: 10px;
     object-fit: cover;
 }
@@ -58,10 +71,20 @@ h2 {
 .price {
     margin-left: auto;
     font-weight: bold;
+    background: #ff7a00;
+    color: white;
+    padding: 6px 10px;
+    border-radius: 8px;
 }
 
 .hidden {
     display: none;
+}
+
+.top-text {
+    text-align:center;
+    color:#777;
+    margin-bottom:10px;
 }
 </style>
 </head>
@@ -69,30 +92,30 @@ h2 {
 <body>
 
 <div class="container" id="lang">
-<h2>🌍 Dil seçiniz</h2>
+<h2 style="text-align:center;">🌍 Dil seçiniz</h2>
 
 <button class="lang-btn" onclick="loadMenu('tr')">🇹🇷 Türkçe</button>
 <button class="lang-btn" onclick="loadMenu('fr')">🇫🇷 Français</button>
 <button class="lang-btn" onclick="loadMenu('nl')">🇧🇪 Nederlands</button>
-
 </div>
 
 <div class="container hidden" id="menu"></div>
 
 <script>
 
-// 🔴 BURAYA KENDİ SHEETS LINKİNİ KOY
-const sheetURL = "https://opensheet.elk.sh/1ctqry-ahkGcmaAxr7xLueborI5cGTQUBlvEZcAJhbCc/Sheet1";
+// ✅ SENİN SHEET LINKİN (DEĞİŞTİRME)
+const sheetURL = "https://opensheet.elk.sh/1ctqry-ahkGcmaAxr7xLueborI5cGTQUBlvEZcAJhbCc/Sayfa1";
 
 function loadMenu(lang) {
     document.getElementById('lang').style.display = 'none';
-    document.getElementById('menu').classList.remove("hidden");
+    const menuDiv = document.getElementById('menu');
+    menuDiv.classList.remove("hidden");
 
     fetch(sheetURL)
     .then(res => res.json())
     .then(data => {
 
-        let html = "";
+        let html = `<div class="top-text">📱 Menü görüntüleme amaçlıdır</div>`;
         let currentCategory = "";
 
         data.forEach(item => {
@@ -100,22 +123,28 @@ function loadMenu(lang) {
             let kategori = item["kategori_" + lang];
             let urun = item["urun_" + lang];
 
+            if (!kategori || !urun) return;
+
             if (kategori !== currentCategory) {
-                html += `<h2>${kategori}</h2>`;
+                html += `<div class="category">${kategori}</div>`;
                 currentCategory = kategori;
             }
 
             html += `
             <div class="card">
-                <img src="${item.resim}" alt="">
+                <img src="${item.resim || 'https://via.placeholder.com/90'}">
                 <div class="title">${urun}</div>
-                <div class="price">${item.fiyat}</div>
+                <div class="price">${item.fiyat || ''}</div>
             </div>
             `;
         });
 
-        document.getElementById('menu').innerHTML = html;
+        menuDiv.innerHTML = html;
 
+    })
+    .catch(err => {
+        menuDiv.innerHTML = "Menü yüklenemedi";
+        console.error(err);
     });
 }
 
